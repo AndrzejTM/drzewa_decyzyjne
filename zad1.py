@@ -1,38 +1,38 @@
-def load_data(file_path):
-    with open(file_path, 'r') as f:
-        data = [line.strip().split() for line in f.readlines()]
-    return data
-def calculate_attribute_values(data):
-    num_attributes = len(data[0]) - 1  # Zakładamy, że ostatnia kolumna to atrybut decyzyjny
-    attribute_values = {i: set() for i in range(num_attributes)}  # Zbiór unikalnych wartości dla każdego atrybutu
+import numpy as np
 
-    for record in data:
-        for i in range(num_attributes):
-            attribute_values[i].add(record[i])
+def wczytaj_dane(plik: str):
+    # Wczytanie danych z pliku
+    # Zakładamy, że dane są oddzielone spacjami lub tabulatorami, a kolumny są rozdzielone wierszami
+    dane = np.loadtxt(plik, dtype=str)
+    return dane
 
-    return attribute_values
+def liczba_unikalnych_wartosci(dane):
+    # Obliczamy liczbę unikalnych wartości dla każdego atrybutu (kolumny)
+    unikalne_wartosci = []
+    for i in range(dane.shape[1] - 1):  # Ostatnia kolumna to atrybut decyzyjny, więc pomijamy ją
+        unikalne_wartosci.append(np.unique(dane[:, i]))
+    return unikalne_wartosci
 
+def wystapienia_wartosci(dane):
+    # Obliczamy wystąpienia każdej wartości dla każdego atrybutu
+    wystapienia = []
+    for i in range(dane.shape[1] - 1):  # Ostatnia kolumna to atrybut decyzyjny
+        wartosci, liczba = np.unique(dane[:, i], return_counts=True)
+        wystapienia.append(dict(zip(wartosci, liczba)))  # Mapowanie wartości do liczby wystąpień
+    return wystapienia
 
-def count_attribute_occurrences(data):
-    num_attributes = len(data[0]) - 1
-    occurrences = {i: {} for i in
-                   range(num_attributes)}  # Słownik dla każdego atrybutu, który przechowuje liczby wystąpień
+# Testowanie funkcji
+plik = "tabela_decyzyjna.txt"  # Przykład nazwy pliku
+dane = wczytaj_dane(plik)
 
-    for record in data:
-        for i in range(num_attributes):
-            value = record[i]
-            if value in occurrences[i]:
-                occurrences[i][value] += 1
-            else:
-                occurrences[i][value] = 1
+# Obliczanie liczby unikalnych wartości
+unikalne_wartosci = liczba_unikalnych_wartosci(dane)
+print("Liczba unikalnych wartości dla każdego atrybutu:")
+for idx, unikalne in enumerate(unikalne_wartosci):
+    print(f"Atrybut {idx + 1}: {unikalne}")
 
-    return occurrences
-
-file_path = 'data.txt'
-data = load_data(file_path)
-
-attribute_values = calculate_attribute_values(data)
-occurrences = count_attribute_occurrences(data)
-
-print("Attribute Values:", attribute_values)
-print("Occurrences:", occurrences)
+# Obliczanie wystąpień wartości
+wystapienia = wystapienia_wartosci(dane)
+print("\nWystąpienia wartości dla każdego atrybutu:")
+for idx, wystapienie in enumerate(wystapienia):
+    print(f"Atrybut {idx + 1}: {wystapienie}")
